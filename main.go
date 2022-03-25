@@ -7,11 +7,11 @@ import (
 )
 
 func main() {
-	var countGo int
-	var address, port string
+	var grt int
+	var addr, p string
 
 	fmt.Print("Выберите количество потоков: ")
-	_, err := fmt.Scanf("%d", &countGo)
+	_, err := fmt.Scanf("%d", &grt)
 
 	if err != nil {
 		fmt.Println("Goroutines is invalid,", err)
@@ -19,13 +19,13 @@ func main() {
 	}
 
 	fmt.Print("Введите адрес прозвона: ")
-	_, err = fmt.Scanf("%s", &address)
+	_, err = fmt.Scanf("%s", &addr)
 	if err != nil {
 		fmt.Println("Address is Invalid", err)
 		return
 	}
 
-	_, err = url.Parse(address)
+	_, err = url.Parse(addr)
 
 	if err != nil {
 		fmt.Println(err)
@@ -33,14 +33,14 @@ func main() {
 	}
 
 	fmt.Print("Введите порт прозвона: ")
-	_, err = fmt.Scanf("%s", &port)
+	_, err = fmt.Scanf("%s", &p)
 
 	if err != nil {
 		fmt.Println("Port is invalid,", err)
 		return
 	}
 
-	requests.Call(address, port)
+	requests.Call(addr, p, grt)
 
 	fmt.Println("Збазиба!")
 }
