@@ -1,2 +1,4 @@
 # SynAck
-AWESOME PROJECT
+##Core team:
+###danabolik and FalloutBaby
+![img.png](images/gomem.gif)
