@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SynAck/requests"
 	"fmt"
 	"net/url"
 )
@@ -24,7 +25,8 @@ func main() {
 		return
 	}
 
-	_, err = url.ParseRequestURI(address)
+	_, err = url.Parse(address)
+
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -37,6 +39,8 @@ func main() {
 		fmt.Println("Port is invalid,", err)
 		return
 	}
+
+	requests.Call(address, port)
 
 	fmt.Println("Збазиба!")
 }
