@@ -2,8 +2,8 @@ package requests
 
 import "net"
 
-func Call(port string) {
-	conn, err := net.Dial("tcp", "scanme.nmap.org:"+port)
+func Call(address, port string) {
+	conn, err := net.Dial("tcp", address+":"+port)
 	if err != nil {
 		println(err)
 		return
