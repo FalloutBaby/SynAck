@@ -13,14 +13,14 @@ func main() {
 	_, err := fmt.Scanf("%d", &countGo)
 
 	if err != nil {
-		fmt.Println("Gorutines is invalid,", err)
+		fmt.Println("Goroutines is invalid,", err)
 		return
 	}
 
 	fmt.Print("Введите адрес прозвона: ")
 	_, err = fmt.Scanf("%s", &address)
 	if err != nil {
-		fmt.Println("Adress is Invalid", err)
+		fmt.Println("Address is Invalid", err)
 		return
 	}
 
