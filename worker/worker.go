@@ -1,4 +1,4 @@
-package requests
+package worker
 
 import (
 	"fmt"
@@ -6,23 +6,24 @@ import (
 	"sync"
 )
 
-func Call(addr, p string, grt int) {
+func Scan(addr, p string, grt int) {
 	wg := sync.WaitGroup{}
-	wg.Add(grt)
-
 	chs := make(map[int]chan string)
+
 	for i := 1; i <= grt; i++ {
+		wg.Add(1)
 		chs[i] = make(chan string)
 		go func() {
 			defer wg.Done()
 
+			_, err := net.Dial("tcp", addr+":"+p)
+			if err != nil {
+				fmt.Println(err)
+			}
+			//TODO: expand
+			println(p)
 		}()
 	}
 	wg.Wait()
-	fmt.Println(chs)
-	_, err := net.Dial("tcp", addr+":"+p)
 
-	if err != nil {
-		fmt.Println(err)
-	}
 }

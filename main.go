@@ -1,7 +1,7 @@
 package main
 
 import (
-	"SynAck/requests"
+	"SynAck/worker"
 	"fmt"
 	"net/url"
 )
@@ -11,7 +11,7 @@ func main() {
 	var addr, p string
 
 	fmt.Print("Выберите количество потоков: ")
-	_, err := fmt.Scanf("%d", &grt)
+	_, err := fmt.Scanln(&grt)
 
 	if err != nil {
 		fmt.Println("Goroutines is invalid,", err)
@@ -19,7 +19,7 @@ func main() {
 	}
 
 	fmt.Print("Введите адрес прозвона: ")
-	_, err = fmt.Scanf("%s", &addr)
+	_, err = fmt.Scanln(&addr)
 	if err != nil {
 		fmt.Println("Address is Invalid", err)
 		return
@@ -40,7 +40,7 @@ func main() {
 		return
 	}
 
-	requests.Call(addr, p, grt)
+	worker.Scan(addr, p, grt)
 
 	fmt.Println("Збазиба!")
 }
