@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SynAck/producer"
 	"SynAck/worker"
 	"fmt"
 	"net/url"
@@ -8,11 +9,10 @@ import (
 
 func main() {
 	var grt int
-	var addr, p string
+	var addr string
 
 	fmt.Print("Выберите количество потоков: ")
 	_, err := fmt.Scanln(&grt)
-
 	if err != nil {
 		fmt.Println("Goroutines is invalid,", err)
 		return
@@ -26,20 +26,12 @@ func main() {
 	}
 
 	_, err = url.Parse(addr)
-
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	//
-	//fmt.Print("Введите порт прозвона: ")
-	//_, err = fmt.Scanf("%s", &p)
-
-	if err != nil {
-		fmt.Println("Port is invalid,", err)
-		return
-	}
+	p := producer.GetPorts()
 
 	worker.Scan(addr, p, grt)
 
