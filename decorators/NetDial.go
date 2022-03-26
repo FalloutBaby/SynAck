@@ -2,15 +2,14 @@ package decorators
 
 import "net"
 
-type Decorator struct {
-	net.Dialer
-	network, address string
-}
-
-func (d Decorator) Dial(network, address string) (net.Conn, error) {
-	conn, err := d.Dial(network, address)
-	if err != nil {
-
+func Dial(network, addr string, ps []string) []string {
+	var result []string
+	for _, p := range ps {
+		_, err := net.Dial(network, addr+":"+p)
+		if err != nil {
+		} else {
+			result = append(result, p)
+		}
 	}
-	return conn, nil
+	return result
 }
