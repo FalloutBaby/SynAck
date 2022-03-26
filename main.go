@@ -32,8 +32,9 @@ func main() {
 		return
 	}
 
-	fmt.Print("Введите порт прозвона: ")
-	_, err = fmt.Scanf("%s", &p)
+	//
+	//fmt.Print("Введите порт прозвона: ")
+	//_, err = fmt.Scanf("%s", &p)
 
 	if err != nil {
 		fmt.Println("Port is invalid,", err)

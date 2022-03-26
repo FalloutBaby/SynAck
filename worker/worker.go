@@ -20,10 +20,10 @@ func Scan(addr, p string, grt int) {
 			if err != nil {
 				fmt.Println(err)
 			}
+			chs[i] <- p
 			//TODO: expand
 			println(p)
 		}()
 	}
 	wg.Wait()
-
 }
