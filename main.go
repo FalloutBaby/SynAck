@@ -33,7 +33,9 @@ func main() {
 
 	p := producer.GetPorts()
 
-	worker.Scan(addr, p, grt)
+	scan := worker.Scan(addr, p, grt)
+
+	fmt.Println(scan)
 
 	fmt.Println("Збазиба!")
 }
