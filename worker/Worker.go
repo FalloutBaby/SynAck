@@ -1,7 +1,6 @@
 package worker
 
 import (
-	"fmt"
 	"math"
 	"net"
 	"sync"
@@ -34,7 +33,6 @@ func Scan(addr string, ports []string, grt int) []string {
 			for _, p := range ps {
 				_, err := net.Dial("tcp", addr+":"+p)
 				if err != nil {
-					fmt.Println(err)
 				} else {
 					result = append(result, p)
 				}
