@@ -33,7 +33,7 @@ func main() {
 
 	p := producer.GetPorts()
 
-	scan := worker.Scan(addr, p, grt)
+	scan := worker.Worker{}.Scan(addr, p, grt)
 
 	fmt.Println(scan)
 

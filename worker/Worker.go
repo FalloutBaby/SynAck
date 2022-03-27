@@ -9,7 +9,7 @@ import (
 const tcpNetwork = "tcp"
 
 type Worker struct {
-	dialer decorators.NetDialer
+	dialer decorators.DialerDecorator
 }
 
 func (w Worker) Scan(addr string, ports []string, grt int) []string {
@@ -18,12 +18,12 @@ func (w Worker) Scan(addr string, ports []string, grt int) []string {
 	splitPs := splitPorts(ports, grt)
 
 	var result []string
-	for i := 1; i <= grt; i++ {
-		ps := splitPs[i-1]
+	for i := 0; i < grt; i++ {
+		ps := splitPs[i]
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			dial := decorators.DialAll(w.dialer, tcpNetwork, addr, ps)
+			dial := w.dialer.DialAll(tcpNetwork, addr, ps)
 			if dial != "" {
 				result = append(result, dial)
 			}
