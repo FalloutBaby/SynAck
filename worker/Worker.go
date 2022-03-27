@@ -8,7 +8,7 @@ import (
 
 const tcpNetwork = "tcp"
 
-func Scan(addr string, ports []string, grt int) [][]string {
+func Scan(addr string, ports []string, grt int) []string {
 	wg := sync.WaitGroup{}
 
 	countPorts := int(math.Ceil(float64(len(ports)) / float64(grt)))
@@ -25,14 +25,14 @@ func Scan(addr string, ports []string, grt int) [][]string {
 		chunkPs = append(chunkPs, ports[i:end])
 	}
 
-	var result [][]string
+	var result []string
 	for i := 1; i <= grt; i++ {
 		ps := chunkPs[i-1]
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			dial := decorators.Dial(tcpNetwork, addr, ps)
-			if dial != nil {
+			if dial != "" {
 				result = append(result, dial)
 			}
 		}()
