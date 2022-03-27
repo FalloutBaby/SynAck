@@ -11,7 +11,7 @@ func TestDialWhenSuccess(t *testing.T) {
 	ports := []string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"}
 
 	ps := Dial(network, address, ports)
-	assert.Equal(t, []string{"80"}, ps)
+	assert.Equal(t, "80", ps)
 }
 
 func TestDial(t *testing.T) {
@@ -20,5 +20,5 @@ func TestDial(t *testing.T) {
 	ports := []string{"1129", "1183", "1184", "5000", "5001", "8008", "8080", "11371"}
 
 	ps := Dial(network, address, ports)
-	assert.Nil(t, ps)
+	assert.Empty(t, ps)
 }

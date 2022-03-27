@@ -3,9 +3,10 @@ package decorators
 import (
 	"log"
 	"net"
+	"strings"
 )
 
-func Dial(network, addr string, ps []string) []string {
+func Dial(network, addr string, ps []string) string {
 	var result []string
 	for _, p := range ps {
 		c, err := net.Dial(network, addr+":"+p)
@@ -19,5 +20,5 @@ func Dial(network, addr string, ps []string) []string {
 			result = append(result, p)
 		}
 	}
-	return result
+	return strings.Join(result, ", ")
 }
