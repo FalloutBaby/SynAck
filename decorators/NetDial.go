@@ -6,10 +6,21 @@ import (
 	"strings"
 )
 
-func Dial(network, addr string, ps []string) string {
+type Dialer interface {
+	Dial(network, address string) (net.Conn, error)
+}
+
+type NetDialer struct {
+}
+
+func (d NetDialer) Dial(network, address string) (net.Conn, error) {
+	return net.Dial(network, address)
+}
+
+func DialAll(d Dialer, network, addr string, ps []string) string {
 	var result []string
 	for _, p := range ps {
-		c, err := net.Dial(network, addr+":"+p)
+		c, err := d.Dial(network, addr+":"+p)
 		if err != nil {
 			continue
 		} else {

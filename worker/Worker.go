@@ -8,7 +8,11 @@ import (
 
 const tcpNetwork = "tcp"
 
-func Scan(addr string, ports []string, grt int) []string {
+type Worker struct {
+	dialer decorators.NetDialer
+}
+
+func (w Worker) Scan(addr string, ports []string, grt int) []string {
 	wg := sync.WaitGroup{}
 
 	splitPs := splitPorts(ports, grt)
@@ -19,7 +23,7 @@ func Scan(addr string, ports []string, grt int) []string {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			dial := decorators.Dial(tcpNetwork, addr, ps)
+			dial := decorators.DialAll(w.dialer, tcpNetwork, addr, ps)
 			if dial != "" {
 				result = append(result, dial)
 			}

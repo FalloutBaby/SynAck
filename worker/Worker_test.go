@@ -21,6 +21,7 @@ func TestScan(t *testing.T) {
 			"5000", "5001", "8008", "8080", "11371"},
 		resultPorts: []string{"80"},
 	}
-	result := Scan(tests.addr, tests.ports, tests.grt)
+	w := Worker{}
+	result := w.Scan(tests.addr, tests.ports, tests.grt)
 	assert.Equal(t, tests.resultPorts, result)
 }
