@@ -71,7 +71,7 @@ func TestDialAll(t *testing.T) {
 		"",
 	}}
 	for _, p := range provider {
-		ps := NetDialer{}.DialAll(p.network, p.address, p.ports)
+		ps := NetDecorator{p.dialer}.DialAll(p.network, p.address, p.ports)
 		assert.Equal(t, p.openPorts, ps)
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"SynAck/decorators"
 	"SynAck/producer"
 	"SynAck/worker"
 	"fmt"
@@ -33,7 +34,7 @@ func main() {
 
 	p := producer.GetPorts()
 
-	scan := worker.Worker{}.Scan(addr, p, grt)
+	scan := worker.Worker{Decorator: decorators.NetDecorator{Dialer: decorators.NetDialer{}}}.Scan(addr, p, grt)
 
 	fmt.Println(scan)
 

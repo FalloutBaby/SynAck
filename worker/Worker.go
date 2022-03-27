@@ -9,7 +9,7 @@ import (
 const tcpNetwork = "tcp"
 
 type Worker struct {
-	dialer decorators.DialerDecorator
+	Decorator decorators.DialerDecorator
 }
 
 func (w Worker) Scan(addr string, ports []string, grt int) []string {
@@ -23,7 +23,7 @@ func (w Worker) Scan(addr string, ports []string, grt int) []string {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			dial := w.dialer.DialAll(tcpNetwork, addr, ps)
+			dial := w.Decorator.DialAll(tcpNetwork, addr, ps)
 			if dial != "" {
 				result = append(result, dial)
 			}
