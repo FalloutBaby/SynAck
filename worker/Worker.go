@@ -32,7 +32,9 @@ func Scan(addr string, ports []string, grt int) [][]string {
 		go func() {
 			defer wg.Done()
 			dial := decorators.Dial(tcpNetwork, addr, ps)
-			result = append(result, dial)
+			if dial != nil {
+				result = append(result, dial)
+			}
 		}()
 	}
 	wg.Wait()
