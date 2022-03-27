@@ -1,7 +1,7 @@
 package worker
 
 import (
-	"SynAck/decorators"
+	"SynAck/internal/services/decorators"
 	"math"
 	"sync"
 )

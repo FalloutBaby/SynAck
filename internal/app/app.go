@@ -1,14 +1,14 @@
-package main
+package app
 
 import (
-	"SynAck/decorators"
-	"SynAck/producer"
-	"SynAck/worker"
+	"SynAck/internal/services/decorators"
+	"SynAck/internal/services/producer"
+	"SynAck/internal/services/worker"
 	"fmt"
-	"net/url"
+	"regexp"
 )
 
-func main() {
+func Run() {
 	var grt int
 	var addr string
 
@@ -25,18 +25,22 @@ func main() {
 		fmt.Println("Address is Invalid", err)
 		return
 	}
-
-	_, err = url.Parse(addr)
+	var isValid bool
+	isValid, err = regexp.MatchString("([/:\\w\\d]{2,256}\\.)+[\\w]{2,4}", addr)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+	if !isValid {
+		panic("Url is invalid")
+	}
 
 	p := producer.GetPorts()
 
-	scan := worker.Worker{Decorator: decorators.NetDecorator{Dialer: decorators.NetDialer{}}}.Scan(addr, p, grt)
+	dialer := decorators.NetDialer{}
+	decorator := decorators.NetDecorator{Dialer: dialer}
+	openPs := worker.Worker{Decorator: decorator}.Scan(addr, p, grt)
 
-	fmt.Println(scan)
-
+	fmt.Println(openPs)
 	fmt.Println("Збазиба!")
 }
