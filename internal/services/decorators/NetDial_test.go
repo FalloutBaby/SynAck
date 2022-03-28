@@ -45,7 +45,7 @@ type TestDialer struct {
 	conn   ConnStub
 }
 
-func (d TestDialer) Dial(network, address string) (net.Conn, error) {
+func (d TestDialer) DialTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
 	if !d.isOpen {
 		return d.conn, errors.New("failed connection")
 	}
