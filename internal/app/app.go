@@ -1,45 +1,26 @@
 package app
 
 import (
+	"SynAck/internal/delivery"
 	"SynAck/internal/services/decorators"
 	"SynAck/internal/services/producers"
 	"SynAck/internal/services/workers"
 	"fmt"
-	"regexp"
 )
 
+type App struct {
+	dialer    decorators.NetDialer
+	decorator decorators.NetDecorator
+	producer  producers.Generator
+	delivery  delivery.Http
+}
+
 func Run() {
-	var grt int
-	var addr string
+	app := new(App)
+	decorator := decorators.NetDecorator{Dialer: app.dialer}
 
-	fmt.Print("Выберите количество потоков: ")
-	_, err := fmt.Scanln(&grt)
-	if err != nil {
-		fmt.Println("Goroutines is invalid,", err)
-		return
-	}
-
-	fmt.Print("Введите адрес прозвона: ")
-	_, err = fmt.Scanln(&addr)
-	if err != nil {
-		fmt.Println("Address is Invalid", err)
-		return
-	}
-	var isValid bool
-	isValid, err = regexp.MatchString("([/:\\w\\d]{2,256}\\.)+[\\w]{2,4}", addr)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	if !isValid {
-		panic("Url is invalid")
-	}
-
-	p := producers.GetPorts()
-
-	dialer := decorators.NetDialer{}
-	decorator := decorators.NetDecorator{Dialer: dialer}
-	openPs := workers.Worker{Decorator: decorator}.Scan(addr, p, grt)
+	worker := workers.Worker{Decorator: decorator, Delivery: app.delivery, Producer: app.producer}
+	openPs := worker.Scan(producers.GetPorts())
 
 	fmt.Println(openPs)
 	fmt.Println("Збазиба!")

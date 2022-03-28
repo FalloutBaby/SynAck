@@ -1,18 +1,24 @@
 package workers
 
 import (
+	"SynAck/internal/delivery"
 	"SynAck/internal/services/decorators"
+	"SynAck/internal/services/producers"
 	"math"
 	"sync"
 )
 
-const tcpNetwork = "tcp"
-
 type Worker struct {
 	Decorator decorators.DialerDecorator
+	Delivery  delivery.Delivery
+	Producer  producers.Producer
 }
 
-func (w Worker) Scan(addr string, ports []string, grt int) []string {
+func (w Worker) Scan(ports []string) []string {
+	addr := w.Delivery.GetAddress()
+	tcp := w.Delivery.GetNetwork()
+	grt := w.Producer.GetGorutines()
+
 	wg := sync.WaitGroup{}
 
 	splitPs := splitPorts(ports, grt)
@@ -23,7 +29,7 @@ func (w Worker) Scan(addr string, ports []string, grt int) []string {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			dial := w.Decorator.DialAll(tcpNetwork, addr, ps)
+			dial := w.Decorator.DialAll(tcp, addr, ps)
 			chanel <- dial
 		}()
 	}
