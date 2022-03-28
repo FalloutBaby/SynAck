@@ -2,18 +2,20 @@ package workers
 
 import (
 	"github.com/stretchr/testify/assert"
+	"strings"
 	"testing"
 )
 
-type DialerStub struct{}
+type DialerStub struct {
+	openPs    []string
+	callCount int
+}
 
-func (DialerStub) DialAll(network, addr string, ps []string) string {
-	for _, e := range ps {
-		if e == "80" {
-			return "80"
-		}
-	}
-	return ""
+func (d *DialerStub) DialAll(network, addr string, ps []string) string {
+	d.callCount += 1
+	currentOpenPs := strings.Join(ps, ", ")
+	d.openPs = append(d.openPs, currentOpenPs)
+	return currentOpenPs
 }
 
 type dataProvider struct {
@@ -33,7 +35,9 @@ func TestScan(t *testing.T) {
 			"5000", "5001", "8008", "8080", "11371"},
 		resultPorts: []string{"80"},
 	}
-	w := Worker{Decorator: DialerStub{}}
+	dialer := DialerStub{}
+	w := Worker{Decorator: &dialer}
 	result := w.Scan(tests.addr, tests.ports, tests.grt)
-	assert.Equal(t, tests.resultPorts, result)
+	assert.Equal(t, dialer.openPs, result)
+	assert.Equal(t, dialer.callCount, tests.grt)
 }
