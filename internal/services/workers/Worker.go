@@ -14,7 +14,7 @@ type Worker struct {
 	Producer  producers.Producer
 }
 
-func (w Worker) Scan(ports []string) []string {
+func (w Worker) ScanPorts(ports []string) []string {
 	addr := w.Delivery.GetAddress()
 	tcp := w.Delivery.GetNetwork()
 	grt := w.Producer.GetGorutines()

@@ -35,7 +35,7 @@ func (d *DialerStub) DialAll(network, addr string, ps []string) string {
 	return currentOpenPs
 }
 
-func TestScan(t *testing.T) {
+func TestScanPorts(t *testing.T) {
 	ps := []string{"80", "280", "443", "488", "591", "593", "623",
 		"664", "777", "832", "1128", "1129", "1183", "1184",
 		"5000", "5001", "8008", "8080", "11371"}
@@ -45,7 +45,7 @@ func TestScan(t *testing.T) {
 	producer := ProducerStub{}
 	w := Worker{Decorator: dialer, Delivery: delivery, Producer: producer}
 
-	result := w.Scan(ps)
+	result := w.ScanPorts(ps)
 
 	for _, exp := range dialer.openPs {
 		assert.Contains(t, result, exp)
