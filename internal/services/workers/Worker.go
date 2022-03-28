@@ -17,18 +17,28 @@ func (w Worker) Scan(addr string, ports []string, grt int) []string {
 
 	splitPs := splitPorts(ports, grt)
 
-	var result []string
+	chanel := make(chan string, grt)
 	for i := 0; i < grt; i++ {
 		ps := splitPs[i]
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
 			dial := w.Decorator.DialAll(tcpNetwork, addr, ps)
-			if dial != "" {
-				result = append(result, dial)
-			}
+			chanel <- dial
 		}()
 	}
+
+	var result []string
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		for i := 0; i < grt; i++ {
+			ps := <-chanel
+			if ps != "" {
+				result = append(result, ps)
+			}
+		}
+	}()
 	wg.Wait()
 
 	return result

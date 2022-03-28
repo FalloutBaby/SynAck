@@ -17,10 +17,10 @@ func (d *DialerStub) DialAll(network, addr string, ps []string) string {
 	d.network = network
 	d.addr = addr
 	d.cntGs += 1
+	openPs := strings.Join(ps, ", ")
+	d.openPs[d.cntGs-1] = openPs
 
-	currentOpenPs := strings.Join(ps, ", ")
-	d.openPs = append(d.openPs, currentOpenPs)
-	return currentOpenPs
+	return openPs
 }
 
 type dataProvider struct {
@@ -40,12 +40,14 @@ func TestScan(t *testing.T) {
 			"5000", "5001", "8008", "8080", "11371"},
 	}
 
-	dialer := DialerStub{}
+	dialer := DialerStub{openPs: make([]string, tests.grt)}
 	w := Worker{Decorator: &dialer}
 	result := w.Scan(tests.addr, tests.ps, tests.grt)
 
 	assert.Equal(t, dialer.network, tests.network)
 	assert.Equal(t, dialer.addr, tests.addr)
 	assert.Equal(t, dialer.cntGs, tests.grt)
-	assert.Equal(t, dialer.openPs, result)
+	for _, exp := range dialer.openPs {
+		assert.Contains(t, result, exp)
+	}
 }
