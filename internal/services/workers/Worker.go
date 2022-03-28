@@ -44,6 +44,7 @@ func (w Worker) ScanPorts(ports []string) []string {
 				result = append(result, ps)
 			}
 		}
+		close(chanel)
 	}()
 	wg.Wait()
 
