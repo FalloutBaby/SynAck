@@ -9,6 +9,7 @@ import (
 )
 
 type ConnStub struct {
+	isClosed bool
 }
 
 func (c ConnStub) Read(b []byte) (n int, err error) {
@@ -18,6 +19,9 @@ func (c ConnStub) Write(b []byte) (n int, err error) {
 	return 0, nil
 }
 func (c ConnStub) Close() error {
+	if c.isClosed {
+		return errors.New("failed close connection")
+	}
 	return nil
 }
 func (c ConnStub) LocalAddr() net.Addr {
@@ -57,21 +61,43 @@ type dialAllDataProvider struct {
 }
 
 func TestDialAll(t *testing.T) {
-	provider := []dialAllDataProvider{{
-		TestDialer{isOpen: true},
-		"tcp",
-		"scanme.nmap.org",
-		[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
-		"80, 280, 443, 488, 591, 593, 623, 664, 777, 832, 1128",
-	}, {
-		TestDialer{isOpen: false},
-		"tcp",
-		"scanme.nmap.org",
-		[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
-		"",
-	}}
+	provider := []dialAllDataProvider{
+		{
+			TestDialer{isOpen: true, conn: ConnStub{isClosed: false}},
+			"tcp",
+			"scanme.nmap.org",
+			[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
+			"80, 280, 443, 488, 591, 593, 623, 664, 777, 832, 1128",
+		},
+		{
+			TestDialer{isOpen: false, conn: ConnStub{isClosed: false}},
+			"tcp",
+			"scanme.nmap.org",
+			[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
+			"",
+		},
+	}
 	for _, p := range provider {
 		ps := NetDecorator{p.dialer}.DialAll(p.network, p.address, p.ports)
 		assert.Equal(t, p.openPorts, ps)
 	}
+}
+
+type PanicDataProvider struct {
+	dialer  TestDialer
+	network string
+	address string
+	ports   []string
+}
+
+func TestDialAllWhenPanic(t *testing.T) {
+	p := PanicDataProvider{
+		TestDialer{isOpen: true, conn: ConnStub{isClosed: true}},
+		"tcp",
+		"scanme.nmap.org",
+		[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
+	}
+	assert.Panics(t, func() {
+		NetDecorator{p.dialer}.DialAll(p.network, p.address, p.ports)
+	})
 }
