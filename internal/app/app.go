@@ -2,8 +2,8 @@ package app
 
 import (
 	"SynAck/internal/services/decorators"
-	"SynAck/internal/services/producer"
-	"SynAck/internal/services/worker"
+	"SynAck/internal/services/producers"
+	"SynAck/internal/services/workers"
 	"fmt"
 	"regexp"
 )
@@ -35,11 +35,11 @@ func Run() {
 		panic("Url is invalid")
 	}
 
-	p := producer.GetPorts()
+	p := producers.GetPorts()
 
 	dialer := decorators.NetDialer{}
 	decorator := decorators.NetDecorator{Dialer: dialer}
-	openPs := worker.Worker{Decorator: decorator}.Scan(addr, p, grt)
+	openPs := workers.Worker{Decorator: decorator}.Scan(addr, p, grt)
 
 	fmt.Println(openPs)
 	fmt.Println("Збазиба!")

@@ -1,6 +1,8 @@
 package main
 
-import "SynAck/internal/app"
+import (
+	"SynAck/internal/app"
+)
 
 func main() {
 	app.Run()
