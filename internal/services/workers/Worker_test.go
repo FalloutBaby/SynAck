@@ -2,7 +2,6 @@ package workers
 
 import (
 	"SynAck/internal/services/producers"
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -19,10 +18,6 @@ type ProducerStub struct {
 	producers.Generator
 }
 
-func (ps ProducerStub) GetGorutines() int {
-	return 5
-}
-
 func (ps *ProducerStub) WritePsToChan(psChan *chan int) {
 	for i := 1; i <= cap(*psChan); i++ {
 		*psChan <- i
@@ -37,14 +32,14 @@ func (ds DeliveryStub) GetNetwork() string {
 	return "tcp"
 }
 
-func (d *DialerStub) DialAll(network, addr string, p int) string {
+func (d *DialerStub) DialPort(network, addr string, p int) int {
 	d.openPs = append(d.openPs, p)
-
-	return fmt.Sprint(p)
+	return p
 }
 
 func TestScanPorts(t *testing.T) {
-	psChan := make(chan int, 25)
+	i := 25
+	psChan := make(chan int, i)
 
 	dialer := &DialerStub{}
 	delivery := DeliveryStub{}
@@ -53,7 +48,7 @@ func TestScanPorts(t *testing.T) {
 
 	producer.WritePsToChan(&psChan)
 
-	result := w.ScanPorts()
+	result := w.ScanPorts("", 5)
 
 	for _, exp := range dialer.openPs {
 		assert.Contains(t, result, exp)

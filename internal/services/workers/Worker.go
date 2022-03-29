@@ -13,12 +13,10 @@ type Worker struct {
 	Producer  producers.Producer
 }
 
-func (w Worker) ScanPorts() []string {
-	addr := w.Delivery.GetAddress()
+func (w Worker) ScanPorts(addr string, grt int) []int {
 	tcp := w.Delivery.GetNetwork()
-	grt := w.Producer.GetGorutines()
-
-	psChan := make(chan int, 80)
+	amount := 81
+	psChan := make(chan int, amount)
 
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -27,32 +25,43 @@ func (w Worker) ScanPorts() []string {
 		w.Producer.WritePsToChan(&psChan)
 	}()
 
-	chanel := make(chan string, cap(psChan))
+	chanel := make(chan int, cap(psChan)-1)
 	for i := 0; i < grt; i++ {
 		wg.Add(1)
+
 		go func() {
 			defer wg.Done()
+			var cycle int
+			var exit bool
 			for {
-				if p, open := <-psChan; open {
-					dial := w.Decorator.DialAll(tcp, addr, p)
+				p, open := <-psChan
+				if len(psChan) != 0 && open {
+					dial := w.Decorator.DialPort(tcp, addr, p)
 					chanel <- dial
-				} else if len(psChan) == 0 {
+				} else if len(psChan) == 0 && open {
 					close(psChan)
+					exit = true
 					break
 				} else {
+					exit = true
 					break
 				}
+				cycle++
+			}
+
+			if exit {
+				return
 			}
 		}()
 	}
 
-	var result []string
+	var result []int
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for i := 1; i <= cap(chanel); i++ {
+		for i := 0; i < cap(chanel); i++ {
 			ps := <-chanel
-			if ps != "" {
+			if ps != 0 {
 				result = append(result, ps)
 			}
 		}

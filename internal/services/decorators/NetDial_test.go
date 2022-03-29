@@ -53,11 +53,11 @@ func (d TestDialer) DialTimeout(network, address string, timeout time.Duration) 
 }
 
 type dialAllDataProvider struct {
-	dialer    TestDialer
-	network   string
-	address   string
-	ports     []string
-	openPorts string
+	dialer   TestDialer
+	network  string
+	address  string
+	port     int
+	openPort int
 }
 
 func TestDialAll(t *testing.T) {
@@ -66,20 +66,20 @@ func TestDialAll(t *testing.T) {
 			TestDialer{isOpen: true, conn: ConnStub{isClosed: false}},
 			"tcp",
 			"scanme.nmap.org",
-			[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
-			"80, 280, 443, 488, 591, 593, 623, 664, 777, 832, 1128",
+			80,
+			80,
 		},
 		{
 			TestDialer{isOpen: false, conn: ConnStub{isClosed: false}},
 			"tcp",
 			"scanme.nmap.org",
-			[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
-			"",
+			443,
+			0,
 		},
 	}
 	for _, p := range provider {
-		ps := NetDecorator{p.dialer}.DialAll(p.network, p.address, p.ports)
-		assert.Equal(t, p.openPorts, ps)
+		ps := NetDecorator{p.dialer}.DialPort(p.network, p.address, p.port)
+		assert.Equal(t, p.openPort, ps)
 	}
 }
 
@@ -87,7 +87,7 @@ type PanicDataProvider struct {
 	dialer  TestDialer
 	network string
 	address string
-	ports   []string
+	port    int
 }
 
 func TestDialAllWhenPanic(t *testing.T) {
@@ -95,9 +95,9 @@ func TestDialAllWhenPanic(t *testing.T) {
 		TestDialer{isOpen: true, conn: ConnStub{isClosed: true}},
 		"tcp",
 		"scanme.nmap.org",
-		[]string{"80", "280", "443", "488", "591", "593", "623", "664", "777", "832", "1128"},
+		664,
 	}
 	assert.Panics(t, func() {
-		NetDecorator{p.dialer}.DialAll(p.network, p.address, p.ports)
+		NetDecorator{p.dialer}.DialPort(p.network, p.address, p.port)
 	})
 }

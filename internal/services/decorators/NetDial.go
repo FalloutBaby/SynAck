@@ -2,6 +2,7 @@ package decorators
 
 import (
 	"net"
+	"strconv"
 	"time"
 )
 
@@ -17,24 +18,23 @@ func (d NetDialer) DialTimeout(network, address string, timeout time.Duration) (
 }
 
 type DialerDecorator interface {
-	DialAll(network, addr string, p int) string
+	DialPort(network, addr string, p int) int
 }
 
 type NetDecorator struct {
 	Dialer Dialer
 }
 
-func (d NetDecorator) DialAll(network, addr string, p int) string {
+func (d NetDecorator) DialPort(network, addr string, p int) int {
 	timeout := time.Second
-	c, err := d.Dialer.DialTimeout(network, addr+":"+string(p), timeout)
+	c, err := d.Dialer.DialTimeout(network, addr+":"+strconv.Itoa(p), timeout)
 	if err != nil {
-		//TODO: change
-		return ""
+		return 0
 	} else {
 		err := c.Close()
 		if err != nil {
 			panic(err)
 		}
-		return string(p)
+		return p
 	}
 }
