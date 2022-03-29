@@ -5,10 +5,12 @@ import (
 	"testing"
 )
 
-func TestGetPorts(t *testing.T) {
-	ports := []string{
-		"80", "280", "443", "488", "591", "593", "623", "664", "777", "832",
-		"1128", "1129", "1183", "1184", "5000", "5001", "8008", "8080", "11371",
+func TestGenerator_WritePsToChan(t *testing.T) {
+	psChan := make(chan int)
+	g := Generator{}
+	go g.WritePsToChan(&psChan)
+	for i := 1; i <= 65536; i++ {
+		assert.Equal(t, i, <-psChan)
 	}
-	assert.Equal(t, ports, GetPorts())
+	close(psChan)
 }

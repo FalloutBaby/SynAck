@@ -19,8 +19,8 @@ func Run() {
 	app := new(App)
 	decorator := decorators.NetDecorator{Dialer: app.dialer}
 
-	worker := workers.Worker{Decorator: decorator, Delivery: app.delivery, Producer: app.producer}
-	openPs := worker.ScanPorts(producers.GetPorts())
+	worker := workers.Worker{Decorator: decorator, Delivery: app.delivery, Producer: &app.producer}
+	openPs := worker.ScanPorts()
 
 	fmt.Println(openPs)
 	fmt.Println("Збазиба!")

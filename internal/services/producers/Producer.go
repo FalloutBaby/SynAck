@@ -4,17 +4,19 @@ import "fmt"
 
 type Producer interface {
 	GetGorutines() int
+	WritePsToChan(psChan *chan int)
 }
 
 type Generator struct {
 }
 
-func GetPorts() []string {
-	return []string{
-		"80", "280", "443", "488", "591", "593", "623", "664", "777", "832",
-		"1128", "1129", "1183", "1184", "5000", "5001", "8008", "8080", "11371",
+func (g *Generator) WritePsToChan(psChan *chan int) {
+	psCnt := 65536
+	for i := 1; i <= psCnt; i++ {
+		*psChan <- i
 	}
 }
+
 func (g Generator) GetGorutines() int {
 	var grt int
 

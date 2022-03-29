@@ -4,7 +4,6 @@ import (
 	"SynAck/internal/delivery"
 	"SynAck/internal/services/decorators"
 	"SynAck/internal/services/producers"
-	"math"
 	"sync"
 )
 
@@ -14,23 +13,36 @@ type Worker struct {
 	Producer  producers.Producer
 }
 
-func (w Worker) ScanPorts(ports []string) []string {
+func (w Worker) ScanPorts() []string {
 	addr := w.Delivery.GetAddress()
 	tcp := w.Delivery.GetNetwork()
 	grt := w.Producer.GetGorutines()
 
+	psChan := make(chan int, 80)
+
 	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		w.Producer.WritePsToChan(&psChan)
+	}()
 
-	splitPs := splitPorts(ports, grt)
-
-	chanel := make(chan string, grt)
+	chanel := make(chan string, cap(psChan))
 	for i := 0; i < grt; i++ {
-		ps := splitPs[i]
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			dial := w.Decorator.DialAll(tcp, addr, ps)
-			chanel <- dial
+			for {
+				if p, open := <-psChan; open {
+					dial := w.Decorator.DialAll(tcp, addr, p)
+					chanel <- dial
+				} else if len(psChan) == 0 {
+					close(psChan)
+					break
+				} else {
+					break
+				}
+			}
 		}()
 	}
 
@@ -38,7 +50,7 @@ func (w Worker) ScanPorts(ports []string) []string {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		for i := 0; i < grt; i++ {
+		for i := 1; i <= cap(chanel); i++ {
 			ps := <-chanel
 			if ps != "" {
 				result = append(result, ps)
@@ -49,21 +61,4 @@ func (w Worker) ScanPorts(ports []string) []string {
 	wg.Wait()
 
 	return result
-}
-
-func splitPorts(ports []string, grt int) [][]string {
-	countPorts := int(math.Ceil(float64(len(ports)) / float64(grt)))
-
-	var splitPs [][]string
-
-	for i := 0; i < len(ports); i += countPorts {
-		end := i + countPorts
-
-		if end >= len(ports) {
-			end = len(ports) - 1
-		}
-
-		splitPs = append(splitPs, ports[i:end])
-	}
-	return splitPs
 }
