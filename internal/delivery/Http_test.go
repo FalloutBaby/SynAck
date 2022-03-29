@@ -6,5 +6,5 @@ import (
 )
 
 func TestHttp_GetNetwork(t *testing.T) {
-	assert.Equal(t, Http{}.GetNetwork(), "tcp")
+	assert.Equal(t, "tcp", Http{}.GetTcpNetwork())
 }

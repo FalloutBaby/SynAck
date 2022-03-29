@@ -1,13 +1,13 @@
 package workers
 
 import (
-	"SynAck/internal/services/producers"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 )
 
 type DialerStub struct {
-	openPs []int
+	mock.Mock
 }
 
 type DeliveryStub struct {
@@ -15,42 +15,72 @@ type DeliveryStub struct {
 
 type ProducerStub struct {
 	psChan chan int
-	producers.Generator
 }
 
-func (ps *ProducerStub) WritePsToChan(psChan *chan int) {
-	for i := 1; i <= cap(*psChan); i++ {
-		*psChan <- i
+func (ps ProducerStub) WritePsToChan(psChan chan int) {
+	for i := 1; i <= cap(psChan); i++ {
+		psChan <- i
 	}
+	close(psChan)
 }
 
-func (ds DeliveryStub) GetAddress() string {
-	return "scanme.nmap.org"
+func (ps ProducerStub) GetCountPorts() int {
+	return 5
 }
 
-func (ds DeliveryStub) GetNetwork() string {
+func (ds DeliveryStub) GetTcpNetwork() string {
 	return "tcp"
 }
 
 func (d *DialerStub) DialPort(network, addr string, p int) int {
-	d.openPs = append(d.openPs, p)
-	return p
+	args := d.Called(network, addr, p)
+	return args.Int(0)
 }
 
 func TestScanPorts(t *testing.T) {
-	i := 25
-	psChan := make(chan int, i)
+	addr := "scanme.nmap.org"
+	grt := 5
+
+	delivery := DeliveryStub{}
 
 	dialer := &DialerStub{}
-	delivery := DeliveryStub{}
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Once().Return(1)
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Once().Return(2)
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Once().Return(3)
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Once().Return(4)
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Once().Return(5)
+
 	producer := ProducerStub{}
+	psChan := make(chan int, producer.GetCountPorts())
+
 	w := Worker{Decorator: dialer, Delivery: delivery, Producer: &producer}
 
-	producer.WritePsToChan(&psChan)
+	producer.WritePsToChan(psChan)
+	result := w.ScanPorts(addr, grt)
 
-	result := w.ScanPorts("", 5)
-
-	for _, exp := range dialer.openPs {
-		assert.Contains(t, result, exp)
+	exp := []int{1, 2, 3, 4, 5}
+	for _, act := range result {
+		assert.Contains(t, exp, act)
 	}
+}
+
+func TestScanPortsWhenEmpty(t *testing.T) {
+	addr := "scanme.nmap.org"
+	grt := 5
+
+	producer := ProducerStub{}
+	cntPs := producer.GetCountPorts()
+
+	delivery := DeliveryStub{}
+
+	dialer := &DialerStub{}
+	dialer.On("DialPort", delivery.GetTcpNetwork(), addr, mock.Anything).Times(cntPs).Return(0)
+	psChan := make(chan int, cntPs)
+
+	w := Worker{Decorator: dialer, Delivery: delivery, Producer: &producer}
+
+	producer.WritePsToChan(psChan)
+	result := w.ScanPorts(addr, grt)
+
+	assert.Empty(t, result)
 }

@@ -14,7 +14,7 @@ type Worker struct {
 }
 
 func (w Worker) ScanPorts(addr string, grt int) []int {
-	tcp := w.Delivery.GetNetwork()
+	tcp := w.Delivery.GetTcpNetwork()
 	wg := sync.WaitGroup{}
 
 	psChan := make(chan int, w.Producer.GetCountPorts())

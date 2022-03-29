@@ -1,14 +1,12 @@
 package delivery
 
 type Delivery interface {
-	GetNetwork() string
+	GetTcpNetwork() string
 }
 
 type Http struct {
 }
 
-const tcp = "tcp"
-
-func (http Http) GetNetwork() string {
-	return tcp
+func (http Http) GetTcpNetwork() string {
+	return "tcp"
 }
