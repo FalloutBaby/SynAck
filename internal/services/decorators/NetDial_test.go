@@ -60,7 +60,7 @@ type dialAllDataProvider struct {
 	openPort int
 }
 
-func TestDialAll(t *testing.T) {
+func TestNetDial_DialPort(t *testing.T) {
 	provider := []dialAllDataProvider{
 		{
 			TestDialer{isOpen: true, conn: ConnStub{isClosed: false}},
@@ -90,7 +90,7 @@ type PanicDataProvider struct {
 	port    int
 }
 
-func TestDialAllWhenPanic(t *testing.T) {
+func TestNetDial_DialPortWhenPanic(t *testing.T) {
 	p := PanicDataProvider{
 		TestDialer{isOpen: true, conn: ConnStub{isClosed: true}},
 		"tcp",

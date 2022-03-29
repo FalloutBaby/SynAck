@@ -31,7 +31,7 @@ func (d NetDecorator) DialPort(network, addr string, p int) int {
 	if err != nil {
 		return 0
 	} else {
-		err := c.Close()
+		err = c.Close()
 		if err != nil {
 			panic(err)
 		}
