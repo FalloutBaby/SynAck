@@ -19,6 +19,7 @@ func (w Worker) ScanPorts(addr string, grt int) []int {
 
 	psChan := make(chan int, w.Producer.GetCountPorts())
 	go w.Producer.WritePsToChan(psChan)
+	var m sync.Mutex
 
 	var result []int
 	for i := 0; i < grt; i++ {
@@ -28,7 +29,9 @@ func (w Worker) ScanPorts(addr string, grt int) []int {
 			for p := range psChan {
 				dial := w.Decorator.DialPort(tcp, addr, p)
 				if dial != 0 {
+					m.Lock()
 					result = append(result, dial)
+					m.Unlock()
 				}
 			}
 		}()
