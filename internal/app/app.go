@@ -17,7 +17,7 @@ type App struct {
 }
 
 func Run(addr string, grt string) {
-	app := new(App)
+	app := new(App) // TODO: сумарно дублирует Worker, работает Registry
 	decorator := decorators.NetDecorator{Dialer: app.dialer}
 
 	count, _ := strconv.Atoi(grt)

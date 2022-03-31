@@ -14,10 +14,10 @@ type NetDialer struct {
 }
 
 func (d NetDialer) DialTimeout(network, address string, timeout time.Duration) (net.Conn, error) {
-	return net.DialTimeout(network, address, timeout)
+	return net.DialTimeout(network, address, timeout) // TODO: внутри есть структура Dialer, которую можно было мочить без декоратора
 }
 
-type DialerDecorator interface {
+type DialerDecorator interface { // TODO: Это не совсем декоратор это адаптер или фасад
 	DialPort(network, addr string, p int) int
 }
 
@@ -30,7 +30,7 @@ func (d NetDecorator) DialPort(network, addr string, p int) int {
 	c, err := d.Dialer.DialTimeout(network, addr+":"+strconv.Itoa(p), timeout)
 	if err != nil {
 		return 0
-	} else {
+	} else { // TODO: else лишний, только увеличивает вложеность
 		err = c.Close()
 		if err != nil {
 			panic(err)

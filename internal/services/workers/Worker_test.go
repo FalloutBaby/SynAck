@@ -55,13 +55,14 @@ func TestScanPorts(t *testing.T) {
 
 	w := Worker{Decorator: dialer, Delivery: delivery, Producer: &producer}
 
-	producer.WritePsToChan(psChan)
+	producer.WritePsToChan(psChan) // TODO: as code must more specific, test should more generic
 	result := w.ScanPorts(addr, grt)
 
 	exp := []int{1, 2, 3, 4, 5}
 	for _, act := range result {
 		assert.Contains(t, exp, act)
 	}
+	// TODO: dialer.AssertExpectations(t) не выполнен
 }
 
 func TestScanPortsWhenEmpty(t *testing.T) {
