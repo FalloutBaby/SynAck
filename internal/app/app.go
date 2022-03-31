@@ -21,7 +21,7 @@ func Run(addr string, grt string) {
 	decorator := decorators.NetDecorator{Dialer: app.dialer}
 
 	count, _ := strconv.Atoi(grt)
-	worker := workers.Worker{Decorator: decorator, Delivery: app.delivery, Producer: app.producer}
+	worker := workers.Worker{Decorator: decorator, Delivery: app.delivery, Producer: app.producer} // TODO: Нарушение инкапсуляции, можно было создать конструктор
 	openPs := worker.ScanPorts(addr, count)
 
 	fmt.Println(openPs)
